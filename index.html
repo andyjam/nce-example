@@ -55,7 +55,7 @@
 						marker = new google.maps.Marker({
 							position: {lat: Number(data[region].items[i].lat), lng: Number(data[region].items[i].lon)},
 							map: map,
-							icon: '/img/pointer.png'
+							icon: 'pointer.png'
 						});
 						marker.info = new google.maps.InfoWindow({
 							content: data[region].items[i].title
@@ -77,7 +77,7 @@
 	var cluster = {
 		textColor: 'white',
 		textSize: 18,
-		url: '/img/map-cluster.png',
+		url: 'map-cluster.png',
 		width: 61,
 		height: 62
 	};
