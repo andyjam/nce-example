@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>NCE Setup Example</title>
+	<style type="text/css">
+		html { height: 100%; }
+		body { height: 100%; margin: 0; }
+		#map { width: 100%; height: 100%; }
+	</style>
+	<script type='text/javascript' src='markerclusterer_compiled.js'></script>
+</head>
+<body>
+	<div id="map"></div>
+	<script>
+	function loadJSON(path, success, error)
+	{
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function()
+		{
+			if (xhr.readyState === XMLHttpRequest.DONE) {
+				if (xhr.status === 200) {
+					if (success)
+						success(JSON.parse(xhr.responseText));
+				} else {
+					if (error)
+						error(xhr);
+				}
+			}
+		};
+		xhr.open("GET", path, true);
+		xhr.send();
+	}
+	// create google map
+	function initMap() {
+		var hourstamp = parseInt(new Date().getTime() / 1000 / 3600);   // will change once per hour
+		var center = {lat: 50, lng: 30};
+		var map = new google.maps.Map(document.getElementById('map'), {
+			scrollwheel: true,
+			center: center,
+			zoom: 6
+		});
+		// load kmz
+		var kmzLayer = new google.maps.KmlLayer({
+			url: 'https://www.vodafone.ua/3g/map.kmz?' + hourstamp,
+			suppressInfoWindows: true,
+			map: map
+		});
+		// load markers
+		var markers = new Array(), marker;
+		loadJSON("points.json?" + hourstamp, function(data) {
+			for(var region in data) {
+				for(var i in data[region].items) {
+					(function(marker) {
+						marker = new google.maps.Marker({
+							position: {lat: Number(data[region].items[i].lat), lng: Number(data[region].items[i].lon)},
+							map: map,
+							icon: '/img/pointer.png'
+						});
+						marker.info = new google.maps.InfoWindow({
+							content: data[region].items[i].title
+						});
+						markers.push(marker);
+						google.maps.event.addListener(marker, 'click', function() {
+							marker.info.open(map, marker);
+						});
+					})(marker);
+				}
+			}
+			clusterizeMap(map, markers);
+		}, function(xhr) {
+			console.log('error')
+			console.log(xhr)
+		});
+	}
+	// clusterizer
+	var cluster = {
+		textColor: 'white',
+		textSize: 18,
+		url: '/img/map-cluster.png',
+		width: 61,
+		height: 62
+	};
+	var clusterStyles = [cluster, cluster, cluster];
+	function clusterizeMap(map, markers) {
+		new MarkerClusterer(map, markers, {
+			styles: clusterStyles
+		});
+	}
+	</script>
+	<script type='text/javascript' src='//maps.googleapis.com/maps/api/js?callback=initMap' async defer></script>
+</body>
+</html>
