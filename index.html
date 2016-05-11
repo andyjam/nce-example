@@ -48,23 +48,25 @@
 		});
 		// load markers
 		var markers = new Array(), marker;
-		loadJSON("points.json?" + hourstamp, function(data) {
+		loadJSON("https://www.vodafone.ua/3g/uk/points-by-regions.json?" + hourstamp, function(data) {
 			for(var region in data) {
-				for(var i in data[region].items) {
-					(function(marker) {
-						marker = new google.maps.Marker({
-							position: {lat: Number(data[region].items[i].lat), lng: Number(data[region].items[i].lon)},
-							map: map,
-							icon: 'pointer.png'
-						});
-						marker.info = new google.maps.InfoWindow({
-							content: data[region].items[i].title
-						});
-						markers.push(marker);
-						google.maps.event.addListener(marker, 'click', function() {
-							marker.info.open(map, marker);
-						});
-					})(marker);
+				for(var j in data[region].groups) {
+					for(var i in data[region].groups[j].items) {
+						(function(item, marker) {
+							marker = new google.maps.Marker({
+								position: {lat: Number(item.lat), lng: Number(item.lon)},
+								map: map,
+								icon: 'pointer.png'
+							});
+							marker.info = new google.maps.InfoWindow({
+								content: item.title
+							});
+							markers.push(marker);
+							google.maps.event.addListener(marker, 'click', function() {
+								marker.info.open(map, marker);
+							});
+						})(data[region].groups[j].items[i], marker);
+					}
 				}
 			}
 			clusterizeMap(map, markers);
