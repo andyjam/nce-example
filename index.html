@@ -33,7 +33,7 @@
 	}
 	// create google map
 	function initMap() {
-		var hourstamp = parseInt(new Date().getTime() / 1000 / 3600);   // will change once per hour
+		var hourstamp = parseInt(new Date().getTime() / 1000 / 3600 / 60);   // will change once per hour
 		var center = {lat: 50, lng: 30};
 		var map = new google.maps.Map(document.getElementById('map'), {
 			scrollwheel: true,
